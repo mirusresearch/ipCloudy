@@ -1,0 +1,25 @@
+{
+    "env": {
+        "node": true,
+        "es6": true
+
+    },
+    "plugins": ["prettier"],
+    "extends": ["prettier"],
+    "parserOptions": {
+        "ecmaVersion": 8,
+        "sourceType": "module"
+    },
+    "rules": {
+        "prettier/prettier": [
+            "error",
+            {
+                "singleQuote": true,
+                "semi": false,
+                "tabWidth": 4,
+                "printWidth": 100
+            }
+        ],
+        "no-tabs": "error"
+    }
+}
