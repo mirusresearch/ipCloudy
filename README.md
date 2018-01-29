@@ -21,3 +21,17 @@ Lookup module for checking if an IP is in a cloud service range. Ip ranges for t
     console.log(await ipc.check('104.196.27.39')) // -> 'gce'
     console.log(await ipc.check()) // use public ip or current host
 ```
+
+# linting
+
+This project uses [Prettier.js](https://prettier.io/) for code formating and linting. I would recomend installing it globally as described [here](https://prettier.io/docs/en/install.html) and integrate it with your editor.
+
+here is the configuration used
+
+```
+--no-semi: true
+--single-quote: true
+--tab-width: 4
+```
+
+check out `.eslint.rc` as well
