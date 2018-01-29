@@ -17,13 +17,13 @@ class IpCloudy {
     constructor(config) {
         this.config = _.defaultsDeep(config, {
             whoisFallback: {
-                enabled: true,
+                enabled: false,
                 cacheConfig: {
                     max: 100,
                     length: (n, key) => n.length
                 }
             },
-            cidrRangeRefresh: null, //604800000, // 1 week
+            cidrRangeRefresh: 604800000, // 1 week
             saveCache: true
         })
 
