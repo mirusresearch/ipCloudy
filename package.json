@@ -2,7 +2,7 @@
   "name": "ipCloudy",
   "version": "0.0.1",
   "description": "Lookup module for checking if an IP is in a cloud service range ",
-  "main": "src/index.js",
+  "main": "src/ipCloudy.js",
   "repository": "https://github.com/mirusresearch/ipCloudy.git",
   "author": "Alec Troemel <alec@mirusresearch.com>",
   "license": "MIT",
