@@ -5,10 +5,10 @@ const fs = require('fs')
 const _ = require('lodash')
 const path = require('path')
 const Promise = require('bluebird')
-const publicIp = require('public-ip')
 const lruCache = require('lru-cache')
-const flatCache = require('flat-cache')
+const publicIp = require('public-ip')
 const debug = require('debug')('index')
+const flatCache = require('flat-cache')
 const ipRangeCheck = require('ip-range-check')
 
 const providerNames = ['gce', 'aws', 'azure']
