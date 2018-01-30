@@ -1,26 +1,27 @@
 /* global require */
 
 import test from 'ava'
-import { keys } from 'lodash'
+import { keys, difference, isEmpty } from 'lodash'
 const flatCache = require('flat-cache')
 const IpCloudy = require('../../src/ipCloudy.js')
 
-test.beforeEach(t => {
-    t.context.ipc = new IpCloudy()
-    t.context.ipc.init()
+test.beforeEach(async t => {
+    t.context.ipc = new IpCloudy({ saveCache: true })
+    await t.context.ipc.init()
 })
+
 test('constructor() | does not fail', t => {
     new IpCloudy()
     t.pass()
-    // flatCache.clearAll()
 })
 
 test('init() | saves values to cache', async t => {
-    let ipc = new IpCloudy()
+    let expected = ['gce', 'aws', 'azure', 'gce:timestamp', 'aws:timestamp', 'azure:timestamp']
+    let ipc = new IpCloudy({ saveCache: true })
     await ipc.init()
 
-    let k = keys(ipc.cidrRangeCache.all())
-    t.deepEqual(k, ['gce', 'aws', 'azure'])
+    let k = keys(ipc.providerCache.all())
+    t.true(isEmpty(difference(k, expected)))
 })
 
 test.todo('init() | uses saved to file cache if present')

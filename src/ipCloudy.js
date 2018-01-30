@@ -1,4 +1,4 @@
-/* global module, require, __dirname, setInterval */
+/* global module, require, __dirname, setInterval, setTimeout */
 'use strict'
 
 const fs = require('fs')
@@ -23,16 +23,18 @@ class IpCloudy {
                     length: (n, key) => n.length
                 }
             },
-            cidrRangeRefresh: 604800000, // 1 week
+            providerCacheName: 'CIDR_RANGE_CACHE',
+            providerCacheMaxAge: 604800000, // 1 week
             saveCache: true
         })
 
         // IP ranges
-        this.providers = _.map(providerNames, name => ({
-            name,
-            func: require(`./providers/${name}.js`)
-        }))
-        this.cidrRangeCache = flatCache.load('CIDR_RANGE_CACHE')
+        this.providers = _.reduce(
+            providerNames,
+            (acc, name) => _.set(acc, name, require(`./providers/${name}.js`)),
+            {}
+        )
+        this.providerCache = flatCache.load(this.config.providerCacheName)
 
         // whois fallback
         this.whoisFallback = require('./providers/whois.js')
@@ -41,33 +43,60 @@ class IpCloudy {
         }
     }
 
-    async _refreshCidrRangeCache() {
-        await Promise.each(this.providers, async provider => {
+    async _refreshProviderCache(name) {
+        let data = await this.providers[name]()
+        this.providerCache.setKey(name, data)
+        this.providerCache.setKey(name + ':timestamp', Date.now())
+        debug(`refreshed ${name} ip ranges`)
+
+        if (this.config.saveCache) {
+            this.providerCache.save(true)
+            debug(`save ${name} cache out to file`)
+        }
+    }
+
+    _provideCacheExpired(name) {
+        let now = Date.now()
+        let age = this.providerCache.getKey(name + ':timestamp')
+
+        if (_.isNil(age)) {
+            return true
+        } else if (age + this.config.providerCacheMaxAge < now) {
+            return true
+        } else {
+            return false
+        }
+    }
+
+    _timeTilProviderCacheExpire(name) {
+        let now = Date.now()
+        let age = this.providerCache.getKey(name + ':timestamp') || 0
+        return Math.abs(now - (age + this.config.providerCacheMaxAge))
+    }
+
+    _startRefreshInterval(name) {
+        setInterval(
+            async () => await this._refreshProviderCache(name),
+            this.config.providerCacheMaxAge
+        )
+    }
+
+    async init(forceRefresh = false) {
+        await Promise.each(_.keys(this.providers), async name => {
             try {
-                this.cidrRangeCache.setKey(provider.name, await provider.func())
-                debug(`refreshed ${provider.name} ip ranges`)
+                if (this._provideCacheExpired(name)) {
+                    await this._refreshProviderCache(name)
+                    this._startRefreshInterval(name)
+                } else {
+                    setTimeout(async () => {
+                        await this._refreshProviderCache(name)
+                        this._startRefreshInterval(name)
+                    }, this._timeTilProviderCacheExpire(name))
+                }
             } catch (err) {
                 debug(err)
             }
         })
-
-        if (this.config.saveCache) {
-            this.cidrRangeCache.save()
-        }
-    }
-
-    async init(forceRefresh = false) {
-        if (forceRefresh || !_.isEqual(_.keys(this.cidrRangeCache.all()), providerNames)) {
-            await this._refreshCidrRangeCache()
-        } else {
-            debug('used saved cache for ip ranges')
-        }
-
-        if (!_.isNil(this.config.cidrRangeRefresh)) {
-            setInterval(async () => {
-                await this._refreshCidrRangeCache()
-            }, this.config.cidrRangeRefresh)
-        }
     }
 
     async check(ip = null) {
@@ -76,7 +105,10 @@ class IpCloudy {
         }
 
         for (let name of providerNames) {
-            let ranges = this.cidrRangeCache.getKey(name)
+            let ranges = this.providerCache.getKey(name)
+            // if (name === 'gce') {
+            //     console.log(ranges)
+            // }
             if (ipRangeCheck(ip, ranges)) {
                 return name
             }
