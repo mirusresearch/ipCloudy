@@ -36,7 +36,7 @@ In Node.js:
 ```
 
 # Development #
-Issues and PR's always welcome, just follow the prettier.js style guides described below.
+Issues and PR's are always welcome, just follow the prettier.js style guides described below.
 
 ## Testing ##
 This project uses Ava.js. To run the tests clone the repo, then run:
