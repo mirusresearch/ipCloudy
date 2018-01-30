@@ -82,9 +82,10 @@ class IpCloudy {
     }
 
     async init(forceRefresh = false) {
-        await Promise.each(_.keys(this.providers), async name => {
+        await Promise.each(providerNames, async name => {
             try {
                 if (this._provideCacheExpired(name)) {
+                    // doesnt exist counts as expired
                     await this._refreshProviderCache(name)
                     this._startRefreshInterval(name)
                 } else {
