@@ -28,9 +28,9 @@ class IpCloudy {
         })
 
         // IP ranges
-        this.providers = _.map(providerNames, p => ({
-            name: p,
-            func: require(`./providers/${p}.js`)
+        this.providers = _.map(providerNames, name => ({
+            name,
+            func: require(`./providers/${name}.js`)
         }))
         this.cidrRangeCache = flatCache.load('CIDR_RANGE_CACHE')
 
@@ -44,15 +44,16 @@ class IpCloudy {
     async _refreshCidrRangeCache() {
         await Promise.each(this.providers, async provider => {
             try {
-                var newRanges = await provider.func()
-                this.cidrRangeCache.setKey(provider.name, newRanges)
+                this.cidrRangeCache.setKey(provider.name, await provider.func())
                 debug(`refreshed ${provider.name} ip ranges`)
             } catch (err) {
                 debug(err)
             }
         })
 
-        if (this.config.saveCache) this.cidrRangeCache.save()
+        if (this.config.saveCache) {
+            this.cidrRangeCache.save()
+        }
     }
 
     async init(forceRefresh = false) {
@@ -70,11 +71,15 @@ class IpCloudy {
     }
 
     async check(ip = null) {
-        if (ip === null) ip = await publicIp.v4()
+        if (ip === null) {
+            ip = await publicIp.v4()
+        }
 
         for (let name of providerNames) {
             let ranges = this.cidrRangeCache.getKey(name)
-            if (ipRangeCheck(ip, ranges)) return name
+            if (ipRangeCheck(ip, ranges)) {
+                return name
+            }
         }
 
         if (this.config.whoisFallback.enabled) {
@@ -83,6 +88,7 @@ class IpCloudy {
                 debug(`${ip} whois cached, returning that`)
                 return cachedValue
             }
+
             debug(`${ip} whois not in cache, getting it`)
             let newValue = this.whoisFallback(ip)
             this.whoisCache.set(ip, newValue)
