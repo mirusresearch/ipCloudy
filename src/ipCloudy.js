@@ -23,8 +23,11 @@ class IpCloudy {
                     length: (n, key) => n.length
                 }
             },
-            providerCacheName: 'CIDR_RANGE_CACHE',
-            providerCacheMaxAge: 604800000, // 1 week
+            providerCache: {
+                name: 'CIDR_RANGE_CACHE',
+                refreshRate: 5000, // 5 seconds
+                maxAge: 604800000 // 1 week
+            },
             saveCache: true
         })
 
@@ -34,7 +37,7 @@ class IpCloudy {
             (acc, name) => _.set(acc, name, require(`./providers/${name}.js`)),
             {}
         )
-        this.providerCache = flatCache.load(this.config.providerCacheName)
+        this.providerCache = flatCache.load(this.config.providerCache.name)
 
         // whois fallback
         this.whoisFallback = require('./providers/whois.js')
@@ -44,59 +47,42 @@ class IpCloudy {
     }
 
     async _refreshProviderCache(name) {
-        let data = await this.providers[name]()
-        this.providerCache.setKey(name, data)
-        this.providerCache.setKey(name + ':timestamp', Date.now())
-        debug(`refreshed ${name} ip ranges`)
+        try {
+            let data = await this.providers[name]()
+            this.providerCache.setKey(name, data)
+            this.providerCache.setKey(name + ':timestamp', Date.now())
+            debug(`refreshed ${name} ip ranges`)
 
-        if (this.config.saveCache) {
-            this.providerCache.save(true)
-            debug(`save ${name} cache out to file`)
+            if (this.config.saveCache) {
+                this.providerCache.save(true)
+                debug(`save ${name} cache out to file`)
+            }
+        } catch (err) {
+            debug(err)
         }
     }
 
-    _provideCacheExpired(name) {
+    async _refreshProviderCacheIfExpired(name) {
         let now = Date.now()
         let age = this.providerCache.getKey(name + ':timestamp')
 
-        if (_.isNil(age)) {
-            return true
-        } else if (age + this.config.providerCacheMaxAge < now) {
-            return true
-        } else {
-            return false
+        if (_.isNil(age) || age + this.config.providerCache.maxAge < now) {
+            return this._refreshProviderCache(name)
         }
-    }
-
-    _timeTilProviderCacheExpire(name) {
-        let now = Date.now()
-        let age = this.providerCache.getKey(name + ':timestamp') || 0
-        return Math.abs(now - (age + this.config.providerCacheMaxAge))
+        return Promise.resolve()
     }
 
     _startRefreshInterval(name) {
-        setInterval(
-            async () => await this._refreshProviderCache(name),
-            this.config.providerCacheMaxAge
-        )
+        setTimeout(async () => {
+            await this._refreshProviderCacheIfExpired(name)
+            this._startRefreshInterval(name)
+        }, this.config.providerCache.refreshRate)
     }
 
     async init(forceRefresh = false) {
         await Promise.each(providerNames, async name => {
-            try {
-                if (this._provideCacheExpired(name)) {
-                    // doesnt exist counts as expired
-                    await this._refreshProviderCache(name)
-                    this._startRefreshInterval(name)
-                } else {
-                    setTimeout(async () => {
-                        await this._refreshProviderCache(name)
-                        this._startRefreshInterval(name)
-                    }, this._timeTilProviderCacheExpire(name))
-                }
-            } catch (err) {
-                debug(err)
-            }
+            await this._refreshProviderCacheIfExpired(name)
+            this._startRefreshInterval(name)
         })
     }
 
