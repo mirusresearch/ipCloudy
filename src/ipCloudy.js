@@ -107,9 +107,7 @@ class IpCloudy {
 
         for (let name of providerNames) {
             let ranges = this.providerCache.getKey(name)
-            // if (name === 'gce') {
-            //     console.log(ranges)
-            // }
+
             if (ipRangeCheck(ip, ranges)) {
                 return name
             }
