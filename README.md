@@ -1,5 +1,6 @@
 ![banner](https://github.com/mirusresearch/ipCloudy/blob/master/banner.jpg)
 ![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)
+[![Build Status](https://travis-ci.org/mirusresearch/ipCloudy.svg?branch=master)](https://travis-ci.org/mirusresearch/ipCloudy)
 
 # Description #
 Lookup module for checking if an IP is in a cloud service range. Ip ranges for the providers are cached in memory (and optionally written out to file). Ranges will be auto refreshed after a configured interval (1 week by default). If the whois fallback is enabled, the first 100 (this is configurable) ips will be cached using a lru cache.
