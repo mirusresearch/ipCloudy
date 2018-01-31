@@ -81,8 +81,9 @@ class IpCloudy {
         if (!_.isNil(refreshRate) && !this._closed) {
             await Promise.delay(refreshRate);
             await this._refreshProviderCacheIfExpired(name);
-            this._startRefreshInterval(name);
+            return this._startRefreshInterval(name);
         }
+        return Promise.resolve(0);
     }
 
     async init(forceRefresh = false) {

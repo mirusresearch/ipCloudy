@@ -2,12 +2,19 @@
 
 import test from 'ava';
 import { keys, difference, isEmpty } from 'lodash';
+
+const Promise = require('bluebird');
 const flatCache = require('flat-cache');
+
 const IpCloudy = require('../../src/ipCloudy.js');
 
 test.beforeEach(async t => {
     t.context.ipc = new IpCloudy({ saveCache: true });
     await t.context.ipc.init();
+});
+
+test.afterEach(t => {
+    t.context.ipc.stopRefresh();
 });
 
 test('constructor() | does not fail', t => {
@@ -24,9 +31,28 @@ test('init() | saves values to cache', async t => {
     t.true(isEmpty(difference(k, expected)));
 });
 
-test.todo('init() | uses saved to file cache if present');
+test.todo('_refreshProviderCache()');
 
-test.todo('init() | saves new values to cache even with file when overriden');
+test.todo('_refreshProviderCacheIfExpired()');
+
+// cant test that the function never halts...thats the halting problem
+// I can make sure it does multiple loops without resolving though
+test('_startRefreshinterval() | resolves when closed', async t => {
+    let ipc = new IpCloudy({ saveCache: false, providerCache: { refreshRate: 100 } });
+    let bluePromise = Promise.resolve(ipc._startRefreshInterval('gce'));
+    return bluePromise
+        .timeout(500)
+        .then(() => t.fail('should not resolve'))
+        .catch(Promise.TimeoutError, e => t.pass('should timeout because it never resolves'));
+});
+
+test('_startRefreshinterval() | resolves when closed', async t => {
+    let ipc = new IpCloudy({ saveCache: false, providerCache: { refreshRate: 100 } });
+    let promise = ipc._startRefreshInterval('gce');
+
+    ipc.stopRefresh();
+    t.is(await promise, 0);
+});
 
 test('check() | returns appropriate response for azure ip', async t => {
     let result = await t.context.ipc.check('13.70.64.1');
