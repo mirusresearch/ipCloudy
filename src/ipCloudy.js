@@ -1,4 +1,4 @@
-/* global module, require, __dirname, setInterval, setTimeout */
+/* global module, require, __dirname */
 'use strict'
 
 const fs = require('fs')
