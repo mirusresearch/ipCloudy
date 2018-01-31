@@ -34,7 +34,7 @@ class IpCloudy {
         // IP ranges
         this.providers = _.reduce(
             providerNames,
-            (acc, name) => _.set(acc, name, require(`./providers/${name}.js`)),
+            (acc, name) => _.set(acc, name, require(`${__dirname}/providers/${name}.js`)),
             {}
         )
         this.providerCache = flatCache.load(this.config.providerCache.name)
