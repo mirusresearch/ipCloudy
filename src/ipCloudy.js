@@ -98,6 +98,8 @@ class IpCloudy {
     }
 
     async check(ip = null) {
+        let result = { cloud: null, whois: null }
+
         if (ip === null) {
             ip = await publicIp.v4()
         }
@@ -106,23 +108,20 @@ class IpCloudy {
             let ranges = this.providerCache.getKey(name)
 
             if (ipRangeCheck(ip, ranges)) {
-                return name
+                result.cloud = name;
             }
         }
 
-        if (this.config.whoisFallback.enabled) {
-            let cachedValue = this.whoisCache.get(ip)
-            if (!_.isNil(cachedValue)) {
-                debug(`${ip} whois cached, returning that`)
-                return cachedValue
+        if (!result.cloud && this.config.whoisFallback.enabled) {
+            let whoisValue = this.whoisCache.get(ip)
+            if (_.isNil(whoisValue)) {
+                debug(`${ip} whois not in cache, getting it`)
+                whoisValue = await this.whoisFallback(ip)
+                this.whoisCache.set(ip, whoisValue)
             }
-
-            debug(`${ip} whois not in cache, getting it`)
-            let newValue = this.whoisFallback(ip)
-            this.whoisCache.set(ip, newValue)
-            return newValue
+            result.whois = whoisValue
         }
-        return 'unknown'
+        return result
     }
 }
 
