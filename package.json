@@ -9,7 +9,7 @@
   "license": "MIT",
   "scripts": {
     "test": "ava test/unit",
-    "lint": "eslint src test bin"
+    "lint": "eslint src test --fix"
   },
   "dependencies": {
     "axios": "^0.17.1",

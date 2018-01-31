@@ -39,7 +39,7 @@ In Node.js:
 
     // this will end the cache refresh intervals, so the node process can resolve
     // alternatively, you can set providerCache.refreshRate to null to disable the refresh intervals
-    ipc.close()
+    ipc.stopRefresh()
 ```
 
 # Development #
@@ -60,7 +60,7 @@ This project uses [Prettier.js](https://prettier.io/) for code formating and lin
 here is the configuration used
 
 ```
---no-semi: true
+--no-semi: false
 --single-quote: true
 --tab-width: 4
 --print-width: 100
