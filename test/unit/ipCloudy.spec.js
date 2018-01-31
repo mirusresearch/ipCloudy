@@ -19,7 +19,13 @@ test.after(t => {
 });
 
 test.beforeEach(async t => {
-    t.context.ipc = new IpCloudy({ providerCache: { writeToFile: false } });
+    t.context.ipc = new IpCloudy({
+        providerCache: {
+            writeToFile: false,
+            path: `${__dirname}/.cache/`,
+            maxAge: -1
+        }
+    });
     await t.context.ipc.init();
 });
 
@@ -36,7 +42,6 @@ test('init() | saves values to cache', async t => {
     let expected = ['gce', 'aws', 'azure', 'gce:timestamp', 'aws:timestamp', 'azure:timestamp'];
     let ipc = new IpCloudy({ saveCache: true });
     await ipc.init();
-
     let k = keys(ipc.providerCache.all());
     t.true(isEmpty(difference(k, expected)));
 });

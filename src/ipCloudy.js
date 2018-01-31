@@ -25,8 +25,9 @@ class IpCloudy {
             },
             providerCache: {
                 name: 'CIDR_RANGE_CACHE',
+                path: undefined,
                 refreshRate: 5000, // 5 seconds, null to disable
-                maxAge: 604800000, // 1 week
+                maxAge: 604800000, // 1 week, -1 for no max age
                 writeToFile: true
             }
         });
@@ -37,7 +38,11 @@ class IpCloudy {
             (acc, name) => _.set(acc, name, require(`${__dirname}/providers/${name}.js`)),
             {}
         );
-        this.providerCache = flatCache.load(this.config.providerCache.name);
+
+        this.providerCache = flatCache.load(
+            this.config.providerCache.name,
+            this.config.providerCache.path // if undefined, will use the modules default
+        );
 
         // whois fallback
         this.whoisFallback = require('./providers/whois.js');
@@ -67,18 +72,20 @@ class IpCloudy {
 
     async _refreshProviderCacheIfExpired(name) {
         let now = Date.now();
+        let maxAge = this.config.providerCache.maxAge;
         let age = this.providerCache.getKey(name + ':timestamp');
 
-        if (_.isNil(age) || age + this.config.providerCache.maxAge < now) {
+        if (_.isNil(age) || (age + maxAge < now && maxAge > -1)) {
             return this._refreshProviderCache(name);
         }
         return Promise.resolve(0);
     }
 
     async _startRefreshInterval(name) {
+        let maxAge = this.config.providerCache.maxAge;
         let refreshRate = this.config.providerCache.refreshRate;
 
-        if (!_.isNil(refreshRate) && !this._closed) {
+        if (maxAge > -1 && !this._closed) {
             await Promise.delay(refreshRate);
             await this._refreshProviderCacheIfExpired(name);
             return this._startRefreshInterval(name);
