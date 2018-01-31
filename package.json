@@ -1,14 +1,15 @@
 {
   "name": "ip-cloudy",
-  "version": "0.0.3",
-  "description": "Lookup module for checking if an IP is in a cloud service range ",
+  "version": "0.0.4",
+    "description": "Lookup module for checking if an IP is in a cloud service range ",
+    "keywords": ["ip", "lookup", "cloud", "gce", "whois", "azure", "aws"],
   "main": "src/ipCloudy.js",
   "repository": "https://github.com/mirusresearch/ipCloudy.git",
   "author": "Alec Troemel <alec@mirusresearch.com>",
   "license": "MIT",
   "scripts": {
     "test": "ava test/unit",
-    "lint": "eslint src test bin --fix"
+    "lint": "eslint src test bin"
   },
   "dependencies": {
     "axios": "^0.17.1",

@@ -25,10 +25,10 @@ class IpCloudy {
             },
             providerCache: {
                 name: 'CIDR_RANGE_CACHE',
-                refreshRate: 5000, // 5 seconds
-                maxAge: 604800000 // 1 week
-            },
-            saveCache: true
+                refreshRate: 5000, // 5 seconds, null to disable
+                maxAge: 604800000, // 1 week
+                writeToFile: true
+            }
         })
 
         // IP ranges
@@ -44,6 +44,9 @@ class IpCloudy {
         if (this.config.whoisFallback.enabled) {
             this.whoisCache = lruCache({ max: this.config.whoisFallback.cacheConfig })
         }
+
+        // if true the infinite refresh loops will halt
+        this._closed = false
     }
 
     async _refreshProviderCache(name) {
@@ -53,7 +56,7 @@ class IpCloudy {
             this.providerCache.setKey(name + ':timestamp', Date.now())
             debug(`refreshed ${name} ip ranges`)
 
-            if (this.config.saveCache) {
+            if (this.config.providerCache.writeToFile) {
                 this.providerCache.save(true)
                 debug(`save ${name} cache out to file`)
             }
@@ -72,11 +75,14 @@ class IpCloudy {
         return Promise.resolve()
     }
 
-    _startRefreshInterval(name) {
-        setTimeout(async () => {
+    async _startRefreshInterval(name) {
+        let refreshRate = this.config.providerCache.refreshRate
+
+        if (!_.isNil(refreshRate) && !this._closed) {
+            await Promise.delay(refreshRate)
             await this._refreshProviderCacheIfExpired(name)
             this._startRefreshInterval(name)
-        }, this.config.providerCache.refreshRate)
+        }
     }
 
     async init(forceRefresh = false) {
@@ -84,6 +90,11 @@ class IpCloudy {
             await this._refreshProviderCacheIfExpired(name)
             this._startRefreshInterval(name)
         })
+    }
+
+    close() {
+        debug('ending refresh loops..')
+        this._closed = true
     }
 
     async check(ip = null) {

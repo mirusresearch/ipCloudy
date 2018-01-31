@@ -24,15 +24,22 @@ In Node.js:
                     length: (n, key) => n.length
                 }
             },
-            providerCacheName: 'CIDR_RANGE_CACHE',
-            providerCacheMaxAge: 604800000, // 1 week. force update to ip range cache
-            saveCache: true // save cache to file when its updated
+            providerCache: {
+                name: 'CIDR_RANGE_CACHE', // name of the cache to use
+                refreshRate: 5000, // 5 seconds, null to disable
+                maxAge: 604800000, // 1 week. force update to ip range cache
+                writeToFile: true  // save cache to file when its update
+            }
     })
 
     ipc.init() // load ip ranges into cache (using saved file if present, else going out and getting the ranges)
 
     console.log(await ipc.check('104.196.27.39')) // -> 'gce'
     console.log(await ipc.check()) // use public ip or current host
+
+    // this will end the cache refresh intervals, so the node process can resolve
+    // alternatively, you can set providerCache.refreshRate to null to disable the refresh intervals
+    ipc.close()
 ```
 
 # Development #
