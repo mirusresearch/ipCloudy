@@ -2,14 +2,24 @@
 
 import test from 'ava';
 import { keys, difference, isEmpty } from 'lodash';
+import * as tk from 'timekeeper';
 
 const Promise = require('bluebird');
 const flatCache = require('flat-cache');
 
 const IpCloudy = require('../../src/ipCloudy.js');
+const date = 1330688329321;
+
+test.before(t => {
+    tk.freeze(new Date(date));
+});
+
+test.after(t => {
+    tk.reset();
+});
 
 test.beforeEach(async t => {
-    t.context.ipc = new IpCloudy({ saveCache: true });
+    t.context.ipc = new IpCloudy({ providerCache: { writeToFile: false } });
     await t.context.ipc.init();
 });
 
@@ -31,9 +41,32 @@ test('init() | saves values to cache', async t => {
     t.true(isEmpty(difference(k, expected)));
 });
 
-test.todo('_refreshProviderCache()');
+test('_refreshProviderCache() | updates cache', async t => {
+    t.context.ipc.providers.test = async () => 'test data';
+    await t.context.ipc._refreshProviderCache('test');
+    t.is(t.context.ipc.providerCache.getKey('test'), 'test data');
+    t.is(t.context.ipc.providerCache.getKey('test:timestamp'), date);
+});
 
-test.todo('_refreshProviderCacheIfExpired()');
+test('_refreshProviderCacheIfExpired() | udpates when past max age', async t => {
+    let ipc = t.context.ipc;
+    ipc.config.providerCache.maxAge = 4999;
+    ipc.providerCache.setKey('test', 'test data');
+    ipc.providerCache.setKey('test:timestamp', date - 5000);
+    ipc._refreshProviderCache = n => Promise.resolve(n);
+    let result = await ipc._refreshProviderCacheIfExpired('test');
+    t.is(result, 'test');
+});
+
+test('_refreshProviderCacheIfExpired() | do not update when under max age', async t => {
+    let ipc = t.context.ipc;
+    ipc.config.providerCache.maxAge = 5001;
+    ipc.providerCache.setKey('test', 'test data');
+    ipc.providerCache.setKey('test:timestamp', date - 5000);
+    ipc._refreshProviderCache = n => Promise.resolve(n);
+    let result = await ipc._refreshProviderCacheIfExpired('test');
+    t.is(result, 0);
+});
 
 // cant test that the function never halts...thats the halting problem
 // I can make sure it does multiple loops without resolving though

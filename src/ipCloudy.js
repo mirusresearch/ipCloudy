@@ -72,7 +72,7 @@ class IpCloudy {
         if (_.isNil(age) || age + this.config.providerCache.maxAge < now) {
             return this._refreshProviderCache(name);
         }
-        return Promise.resolve();
+        return Promise.resolve(0);
     }
 
     async _startRefreshInterval(name) {
