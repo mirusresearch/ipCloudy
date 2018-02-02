@@ -47,7 +47,9 @@ class IpCloudy {
         // whois fallback
         this.whoisFallback = require('./providers/whois.js');
         if (this.config.whoisFallback.enabled) {
-            this.whoisCache = lruCache({ max: this.config.whoisFallback.cacheConfig });
+            this.whoisCache = lruCache({
+                max: this.config.whoisFallback.cacheConfig
+            });
         }
 
         // if true the infinite refresh loops will halt
