@@ -1,6 +1,6 @@
 {
   "name": "ip-cloudy",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Lookup module for checking if an IP is in a cloud service range ",
   "keywords": [
     "ip",

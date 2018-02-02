@@ -3,7 +3,9 @@
 [![Build Status](https://travis-ci.org/mirusresearch/ipCloudy.svg?branch=master)](https://travis-ci.org/mirusresearch/ipCloudy)
 
 # Description #
-Lookup module for checking if an IP is in a cloud service range. Ip ranges for the providers are cached in memory (and optionally written out to file). Ranges will be auto refreshed after a configured interval (1 week by default). If the whois fallback is enabled, the first 100 (this is configurable) ips will be cached using a lru cache.
+Lookup module for checking if an IP is in a cloud service range. Ip ranges for the providers are cached in memory (and optionally written out to file).
+Ranges will be auto refreshed after a configured interval (1 week by default).
+If the whois fallback is enabled, the first 100 (this is configurable) ips will be cached using a lru cache.
 
 # Installation #
 Using npm:
@@ -36,7 +38,7 @@ In Node.js:
     // else going out and getting the ranges
     ipc.init()
 
-    console.log(await ipc.check('104.196.27.39')) // -> 'gce'
+    console.log(await ipc.check('104.196.27.39')) // -> {"cloud": "gce", "whois": null}
     console.log(await ipc.check()) // use public ip or current host
 
     // this will end the cache refresh intervals, so the node process can resolve
