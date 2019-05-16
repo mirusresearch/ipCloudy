@@ -111,7 +111,8 @@ test('check() | falls back to whois organization when enabled', async t => {
     let ipc = new IpCloudy({ whoisFallback: { enabled: true } });
     await ipc.init();
     let result = await ipc.check('208.43.118.0');
-    t.is(result.whois, 'Softlayer Corporate C');
+    const org = result.whois.toLowerCase();
+    t.is(org.startsWith('softlayer'), true);
 });
 
 test('check() | returns "unknown" if ip is not recognized', async t => {
