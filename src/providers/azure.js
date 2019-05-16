@@ -4,7 +4,7 @@ const _ = require('lodash');
 const xml = require('xml2js');
 const axios = require('axios');
 const Promise = require('bluebird');
-const tough = require('tough-cookie');
+
 const axiosCookieJarSupport = require('axios-cookiejar-support').default;
 
 axiosCookieJarSupport(axios);
@@ -26,7 +26,7 @@ module.exports = async function() {
     let xmlResponse = await axios.get(rangeXMLUri, { jar: true, withCredentials: true });
     let jsonData = await parse(xmlResponse.data);
     let regions = jsonData.AzurePublicIpAddresses.Region.map(range =>
-        range.IpRange.map(ipr => ipr.$.Subnet)
+        (range.IpRange || []).map(ipr => ipr.$.Subnet)
     );
 
     return _.flatten(regions);
