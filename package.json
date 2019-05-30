@@ -1,6 +1,6 @@
 {
   "name": "ip-cloudy",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Lookup module for checking if an IP is in a cloud service range ",
   "keywords": [
     "ip",
@@ -20,8 +20,8 @@
     "lint": "eslint src test --fix"
   },
   "dependencies": {
-    "axios": "^0.17.1",
-    "axios-cookiejar-support": "^0.3.2",
+    "axios": "^0.18.0",
+    "axios-cookiejar-support": "^0.4.2",
     "bluebird": "^3.5.1",
     "debug": "^3.1.0",
     "flat-cache": "^2.0.1",
