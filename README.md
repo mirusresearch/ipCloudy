@@ -32,6 +32,9 @@ In Node.js:
                 refreshRate: 5000, // milliseconds
                 maxAge: 604800000, // milliseconds (1 week). -1 for no maxAge
                 writeToFile: true  // save cache to file when its update
+            },
+            whoisConfig: {
+                // config from "whois" package
             }
     })
     // load ip ranges into cache. using saved file if present,
