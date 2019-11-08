@@ -20,8 +20,9 @@ class IpCloudy {
                 enabled: false,
                 cacheConfig: {
                     max: 100,
-                    length: (n, key) => n.length
-                }
+                    length: n => n.length
+                },
+                whoisConfig: { timeout: 5000 }
             },
             providerCache: {
                 name: 'CIDR_RANGE_CACHE',
@@ -124,7 +125,7 @@ class IpCloudy {
             let whoisValue = this.whoisCache.get(ip);
             if (_.isNil(whoisValue)) {
                 debug(`${ip} whois not in cache, getting it`);
-                whoisValue = await this.whoisFallback(ip);
+                whoisValue = await this.whoisFallback(ip, this.config.whoisFallback.whoisConfig);
                 this.whoisCache.set(ip, whoisValue);
             }
             result.whois = whoisValue;

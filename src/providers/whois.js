@@ -3,21 +3,19 @@
 const _ = require('lodash');
 const whois = require('whois');
 const Promise = require('bluebird');
+const debug = require('debug')('whois');
 
 const lookup = Promise.promisify(whois.lookup);
 const entryRegex = /^(network:)?Organization(;I)?:\W*(.*)/;
 
-module.exports = async function(ip) {
-    let data;
+module.exports = async function(ip, whoisConfig) {
     try {
-        data = await lookup(ip);
+        const data = await lookup(ip, whoisConfig);
+        const org = data.split('\n').filter(entry => entryRegex.test(entry));
+
+        return org.length ? org[0].replace(entryRegex, '$3') : null;
     } catch (error) {
-        console.error('ipCloudy:', error);
+        debug('ipCloudy:', error);
         return null;
     }
-    let org = data.split('\n').filter(entry => entryRegex.test(entry));
-    if (org.length) {
-        return org[0].replace(entryRegex, '$3');
-    }
-    return null;
 };
