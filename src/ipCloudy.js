@@ -1,9 +1,7 @@
 /* global module, require, __dirname */
 'use strict';
 
-const fs = require('fs');
 const _ = require('lodash');
-const path = require('path');
 const Promise = require('bluebird');
 const lruCache = require('lru-cache');
 const publicIp = require('public-ip');
@@ -53,6 +51,7 @@ class IpCloudy {
 
         // if true the infinite refresh loops will halt
         this._closed = false;
+        this.timings = {};
     }
 
     async _refreshProviderCache(name) {
@@ -114,10 +113,24 @@ class IpCloudy {
         }
 
         for (let name of providerNames) {
-            let ranges = this.providerCache.getKey(name);
+            const ranges = this.providerCache.getKey(name);
+            const hrstart = process.hrtime();
+            const matched = ipRangeCheck(ip, ranges);
+            const hrend = process.hrtime(hrstart);
+            this.timings[name] = this.timings[name] || [];
+            this.timings[name].push(hrend[1]);
+            if (this.timings[name].length % 100 === 0) {
+                for (const [key, speeds] of Object.entries(this.timings)) {
+                    const sum = speeds.reduce((a, b) => a + b, 0);
+                    const avg = sum / speeds.length;
+                    console.info(`avg ipRangeCheck: ${avg.toFixed(1)}ms for ${key} `);
+                }
+                console.log('-------');
+            }
 
-            if (ipRangeCheck(ip, ranges)) {
+            if (matched) {
                 result.cloud = name;
+                break;
             }
         }
 

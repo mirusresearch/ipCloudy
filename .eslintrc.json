@@ -20,6 +20,14 @@
                 "printWidth": 100
             }
         ],
+        "comma-dangle": [
+            "error",
+            {
+                "functions": "never",
+                "arrays": "only-multiline",
+                "objects": "only-multiline"
+            }
+        ],
         "no-tabs": "error"
     }
 }
