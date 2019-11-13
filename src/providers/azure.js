@@ -14,7 +14,6 @@ const uri = 'https://www.microsoft.com/en-us/download/confirmation.aspx?id=41653
 const fileRegex = /href="(.*?PublicIPs.*?xml)"/;
 
 module.exports = async function() {
-    console.log('getting azure ips');
     let response = await axios.get(uri, { jar: true, withCredentials: true });
     let page = response.data;
 

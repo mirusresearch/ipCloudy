@@ -27,8 +27,6 @@ const ipc = new IpCloudy({
 let speeds = [];
 
 function checkIP(ip, callback) {
-    // ip = '192.168.30.28';
-    // const ip = Faker.internet.ip();
     ipc.check(ip).then(callback);
 }
 

@@ -114,19 +114,19 @@ class IpCloudy {
 
         for (let name of providerNames) {
             const ranges = this.providerCache.getKey(name);
-            const hrstart = process.hrtime();
+            // const hrstart = process.hrtime();
             const matched = ipRangeCheck(ip, ranges);
-            const hrend = process.hrtime(hrstart);
-            this.timings[name] = this.timings[name] || [];
-            this.timings[name].push(hrend[1]);
-            if (this.timings[name].length % 100 === 0) {
-                for (const [key, speeds] of Object.entries(this.timings)) {
-                    const sum = speeds.reduce((a, b) => a + b, 0);
-                    const avg = sum / speeds.length;
-                    console.info(`avg ipRangeCheck: ${avg.toFixed(1)}ms for ${key} `);
-                }
-                console.log('-------');
-            }
+            // const hrend = process.hrtime(hrstart);
+            // this.timings[name] = this.timings[name] || [];
+            // this.timings[name].push(hrend[1]);
+            // if (this.timings[name].length % 100 === 0) {
+            //     for (const [key, speeds] of Object.entries(this.timings)) {
+            //         const sum = speeds.reduce((a, b) => a + b, 0);
+            //         const avg = sum / speeds.length;
+            //         console.info(`avg ipRangeCheck: ${avg.toFixed(1)}ms for ${key} `);
+            //     }
+            //     console.log('-------');
+            // }
 
             if (matched) {
                 result.cloud = name;
