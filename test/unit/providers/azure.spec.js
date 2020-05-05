@@ -1,9 +1,9 @@
-import test from 'ava';
-import { isArray, includes } from 'lodash';
+const test = require('ava');
+const { isArray, includes } = require('lodash');
 
 const provider = require('../../../src/providers/azure.js');
 
-test('returns a array of IP ranges for azure', async t => {
+test('returns a array of IP ranges for azure', async (t) => {
     let result = await provider();
 
     t.true(isArray(result));
