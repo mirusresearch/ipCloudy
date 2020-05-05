@@ -8,7 +8,7 @@ Lookup module for checking if an IP is in a cloud service range. Ip ranges for t
 Ranges will be auto refreshed after a configured interval (1 week by default).
 If the whois fallback is enabled, the first 100 (this is configurable) ips will be cached using a lru cache.
 
-### Version Requirements:
+## Version Requirements:
 
 - versions **before 0.2.0** will work with node 8.0
 - version **0.2.0 and above** require >= node v10.18
