@@ -1,9 +1,7 @@
 /* global module, require, __dirname */
 'use strict';
 
-const fs = require('fs');
 const _ = require('lodash');
-const path = require('path');
 const Promise = require('bluebird');
 const lruCache = require('lru-cache');
 const publicIp = require('public-ip');
@@ -20,17 +18,17 @@ class IpCloudy {
                 enabled: false,
                 cacheConfig: {
                     max: 100,
-                    length: n => n.length
+                    length: (n) => n.length,
                 },
-                whoisConfig: { timeout: 5000 }
+                whoisConfig: { timeout: 5000 },
             },
             providerCache: {
                 name: 'CIDR_RANGE_CACHE',
                 path: undefined,
                 refreshRate: 5000, // 5 seconds, null to disable
                 maxAge: 604800000, // 1 week, -1 for no max age
-                writeToFile: true
-            }
+                writeToFile: true,
+            },
         });
 
         // IP ranges
@@ -46,7 +44,7 @@ class IpCloudy {
         );
 
         // after load do the internal conversion
-        Object.keys(this.providers).forEach(name => {
+        Object.keys(this.providers).forEach((name) => {
             this._convertRangestring(name, this.providerCache.getKey(name));
         });
         //
@@ -145,9 +143,9 @@ class IpCloudy {
     }
 
     async init(forceRefresh = false) {
-        await Promise.each(providerNames, async name => {
+        await Promise.each(providerNames, async (name) => {
             await this._refreshProviderCacheIfExpired(name, forceRefresh);
-            this._startRefreshInterval(name).catch(function(err) {
+            this._startRefreshInterval(name).catch(function (err) {
                 debug(err);
             });
         });
