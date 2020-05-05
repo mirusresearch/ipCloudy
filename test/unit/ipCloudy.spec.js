@@ -39,24 +39,43 @@ test('constructor() | does not fail', t => {
 });
 
 test('init() | saves values to cache', async t => {
-    let expected = ['gce', 'aws', 'azure', 'gce:timestamp', 'aws:timestamp', 'azure:timestamp'];
-    let ipc = new IpCloudy({ saveCache: true });
+    let expected = [
+        'gce:ipv4',
+        'gce:ipv6',
+        'gce:cidripv4',
+        'gce:cidripv6',
+        'gce',
+        'gce:timestamp',
+        'aws:ipv4',
+        'aws:ipv6',
+        'aws:cidripv4',
+        'aws:cidripv6',
+        'aws',
+        'aws:timestamp',
+        'azure:ipv4',
+        'azure:ipv6',
+        'azure:cidripv4',
+        'azure:cidripv6',
+        'azure',
+        'azure:timestamp'
+    ];
+    let ipc = new IpCloudy({ providerCache: { writeToFile: true, path: `${__dirname}/.cache/` } });
     await ipc.init();
     let k = keys(ipc.providerCache.all());
     t.true(isEmpty(difference(k, expected)));
 });
 
 test('_refreshProviderCache() | updates cache', async t => {
-    t.context.ipc.providers.test = async () => 'test data';
+    t.context.ipc.providers.test = async () => ['10.0.0.0/24'];
     await t.context.ipc._refreshProviderCache('test');
-    t.is(t.context.ipc.providerCache.getKey('test'), 'test data');
+    t.is(t.context.ipc.providerCache.getKey('test:cidripv4')[0].toString(), '10.0.0.0/24');
     t.is(t.context.ipc.providerCache.getKey('test:timestamp'), date);
 });
 
 test('_refreshProviderCacheIfExpired() | udpates when past max age', async t => {
     let ipc = t.context.ipc;
     ipc.config.providerCache.maxAge = 4999;
-    ipc.providerCache.setKey('test', 'test data');
+    ipc.providerCache.setKey('test', ['10.0.0.0/24']);
     ipc.providerCache.setKey('test:timestamp', date - 5000);
     ipc._refreshProviderCache = n => Promise.resolve(n);
     let result = await ipc._refreshProviderCacheIfExpired('test');
@@ -66,7 +85,7 @@ test('_refreshProviderCacheIfExpired() | udpates when past max age', async t => 
 test('_refreshProviderCacheIfExpired() | do not update when under max age', async t => {
     let ipc = t.context.ipc;
     ipc.config.providerCache.maxAge = 5001;
-    ipc.providerCache.setKey('test', 'test data');
+    ipc.providerCache.setKey('test', ['10.0.0.0/24']);
     ipc.providerCache.setKey('test:timestamp', date - 5000);
     ipc._refreshProviderCache = n => Promise.resolve(n);
     let result = await ipc._refreshProviderCacheIfExpired('test');
@@ -76,7 +95,7 @@ test('_refreshProviderCacheIfExpired() | do not update when under max age', asyn
 // cant test that the function never halts...thats the halting problem
 // I can make sure it does multiple loops without resolving though
 test('_startRefreshinterval() | resolves when closed', async t => {
-    let ipc = new IpCloudy({ saveCache: false, providerCache: { refreshRate: 100 } });
+    let ipc = new IpCloudy({ providerCache: { refreshRate: 100, writeToFile: false } });
     let bluePromise = Promise.resolve(ipc._startRefreshInterval('gce'));
     return bluePromise
         .timeout(500)
@@ -85,7 +104,7 @@ test('_startRefreshinterval() | resolves when closed', async t => {
 });
 
 test('_startRefreshinterval() | resolves when closed', async t => {
-    let ipc = new IpCloudy({ saveCache: false, providerCache: { refreshRate: 100 } });
+    let ipc = new IpCloudy({ providerCache: { refreshRate: 100, writeToFile: false } });
     let promise = ipc._startRefreshInterval('gce');
 
     ipc.stopRefresh();
@@ -97,6 +116,11 @@ test('check() | returns appropriate response for azure ip', async t => {
     t.is(result.cloud, 'azure');
 });
 
+test('check() | returns appropriate response for azure ip in ipv6 format', async t => {
+    let result = await t.context.ipc.check('0:0:0:0:0:ffff:d46:4001');
+    t.is(result.cloud, 'azure');
+});
+
 test('check() | returns appropriate response for aws ip', async t => {
     let result = await t.context.ipc.check('54.173.231.161');
     t.is(result.cloud, 'aws');
@@ -104,6 +128,11 @@ test('check() | returns appropriate response for aws ip', async t => {
 
 test('check() | returns appropriate response for gce ip', async t => {
     let result = await t.context.ipc.check('104.196.27.39');
+    t.is(result.cloud, 'gce');
+});
+
+test('check() | returns appropriate response for gce ipv6', async t => {
+    let result = await t.context.ipc.check('2600:1900:0000:0000:0000:0000:0000:0000');
     t.is(result.cloud, 'gce');
 });
 
