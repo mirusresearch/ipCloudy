@@ -1,6 +1,6 @@
 {
     "name": "ip-cloudy",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "description": "Lookup module for checking if an IP is in a cloud service range ",
     "keywords": [
         "ip",
@@ -14,6 +14,10 @@
     "main": "src/ipCloudy.js",
     "repository": "https://github.com/mirusresearch/ipCloudy.git",
     "author": "Alec Troemel <alec@mirusresearch.com>",
+    "contributors": [
+        "Andrew Hughes <andrew@mirusresearch.com>",
+        "Zsombor Paróczi <zsombor.paroczi@gmail.com> (https://github.com/realhidden)"
+    ],
     "license": "MIT",
     "scripts": {
         "test": "nyc ava --verbose",
