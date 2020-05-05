@@ -64,3 +64,4 @@ typings/
 .#*
 
 .idea
+/test/CIDR_RANGE_CACHE
