@@ -46,7 +46,7 @@ function runIPTimer() {
 
 async function main() {
     console.log('Initializing ipcloudy...');
-    await ipc.init();
+    await ipc.init(true);
     timer.setInterval(runIPTimer, '', '0u', function(err) {
         if (err) {
             console.error(err);
