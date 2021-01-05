@@ -1,7 +1,6 @@
 ![banner](https://github.com/mirusresearch/ipCloudy/blob/master/banner.jpg)
 ![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)
-![Build Status](https://github.com/mirusresearch/ipCloudy/workflows/test-and-deploy/badge.svg)
-
+![Build Status](https://github.com/mirusresearch/ipCloudy/workflows/Build%20Status/badge.svg)
 
 # Description
 
