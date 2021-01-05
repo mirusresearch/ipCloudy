@@ -1,6 +1,6 @@
 {
     "name": "ip-cloudy",
-    "version": "0.2.2",
+    "version": "0.2.4",
     "description": "Lookup module for checking if an IP is in a cloud service range ",
     "keywords": [
         "ip",
@@ -26,27 +26,27 @@
     },
     "dependencies": {
         "axios": "~0.21.1",
-        "axios-cookiejar-support": "~1.0.0",
+        "axios-cookiejar-support": "~1.0.1",
         "bluebird": "~3.7.2",
-        "debug": "~4.1.1",
-        "flat-cache": "~2.0.1",
-        "ipaddr.js": "^1.9.1",
-        "lodash": "~4.17.15",
-        "lru-cache": "~5.1.1",
-        "public-ip": "~4.0.1",
+        "debug": "~4.3.1",
+        "flat-cache": "~3.0.4",
+        "ipaddr.js": "^2.0.0",
+        "lodash": "~4.17.20",
+        "lru-cache": "~6.0.0",
+        "public-ip": "~4.0.3",
         "tough-cookie": "~4.0.0",
-        "whois": "~2.12.1",
+        "whois": "~2.13.3",
         "xml2js": "~0.4.23"
     },
     "devDependencies": {
-        "ava": "^3.9.0",
-        "eslint": "^7.3.1",
-        "eslint-config-prettier": "^6.11.0",
-        "eslint-plugin-prettier": "^3.1.4",
-        "faker": "^4.1.0",
+        "ava": "^3.15.0",
+        "eslint": "^7.17.0",
+        "eslint-config-prettier": "^7.1.0",
+        "eslint-plugin-prettier": "^3.3.1",
+        "faker": "^5.1.0",
         "nanotimer": "^0.3.15",
         "nyc": "^15.1.0",
-        "prettier": "^2.0.5",
+        "prettier": "^2.2.1",
         "timekeeper": "^2.0.0"
     }
 }
