@@ -1,6 +1,5 @@
 /* global module, require */
 
-const _ = require('lodash');
 const xml = require('xml2js');
 const axios = require('axios');
 const Promise = require('bluebird');
@@ -13,7 +12,7 @@ const parse = Promise.promisify(xml.parseString);
 const uri = 'https://www.microsoft.com/en-us/download/confirmation.aspx?id=41653';
 const fileRegex = /href="(.*?PublicIPs.*?xml)"/;
 
-module.exports = async function() {
+module.exports = async function () {
     let response = await axios.get(uri, { jar: true, withCredentials: true });
     let page = response.data;
 
@@ -25,9 +24,8 @@ module.exports = async function() {
 
     let xmlResponse = await axios.get(rangeXMLUri, { jar: true, withCredentials: true });
     let jsonData = await parse(xmlResponse.data);
-    let regions = jsonData.AzurePublicIpAddresses.Region.map(range =>
-        (range.IpRange || []).map(ipr => ipr.$.Subnet)
+    let regions = jsonData.AzurePublicIpAddresses.Region.map((range) =>
+        (range.IpRange || []).map((ipr) => ipr.$.Subnet)
     );
-
-    return _.flatten(regions);
+    return regions.flat();
 };

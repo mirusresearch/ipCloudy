@@ -1,6 +1,6 @@
 {
     "name": "ip-cloudy",
-    "version": "0.2.4",
+    "version": "0.3.0",
     "description": "Lookup module for checking if an IP is in a cloud service range ",
     "keywords": [
         "ip",
@@ -9,7 +9,8 @@
         "gce",
         "whois",
         "azure",
-        "aws"
+        "aws",
+        "bot"
     ],
     "main": "src/ipCloudy.js",
     "repository": "https://github.com/mirusresearch/ipCloudy.git",
@@ -31,7 +32,7 @@
         "debug": "~4.3.1",
         "flat-cache": "~3.0.4",
         "ipaddr.js": "^2.0.0",
-        "lodash": "~4.17.20",
+        "lodash": "~4.17.21",
         "lru-cache": "~6.0.0",
         "public-ip": "~4.0.3",
         "tough-cookie": "~4.0.0",
@@ -40,10 +41,10 @@
     },
     "devDependencies": {
         "ava": "^3.15.0",
-        "eslint": "^7.17.0",
-        "eslint-config-prettier": "^7.1.0",
-        "eslint-plugin-prettier": "^3.3.1",
-        "faker": "^5.1.0",
+        "eslint": "^7.25.0",
+        "eslint-config-prettier": "^8.3.0",
+        "eslint-plugin-prettier": "^3.4.0",
+        "faker": "^5.5.3",
         "nanotimer": "^0.3.15",
         "nyc": "^15.1.0",
         "prettier": "^2.2.1",

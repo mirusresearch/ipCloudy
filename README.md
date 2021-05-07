@@ -10,8 +10,9 @@ If the whois fallback is enabled, the first 100 (this is configurable) ips will 
 
 ## Version Requirements:
 
-- versions **before 0.2.0** will work with node 8.0
+- versions **before 0.2.0** will work with node 8.x
 - version **0.2.0 and above** require >= node v10.18
+- version **0.3.0 and above** require >= node v12.18
 
 # Installation
 

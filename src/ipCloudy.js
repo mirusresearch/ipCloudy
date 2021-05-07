@@ -1,7 +1,7 @@
 /* global module, require, __dirname */
 'use strict';
 
-const _ = require('lodash');
+const { defaultsDeep } = require('lodash');
 const Promise = require('bluebird');
 const lruCache = require('lru-cache');
 const publicIp = require('public-ip');
@@ -11,9 +11,12 @@ const ipaddr = require('ipaddr.js');
 
 const providerNames = ['gce', 'aws', 'azure'];
 
+function isNil(value) {
+    return value == null;
+}
 class IpCloudy {
     constructor(config) {
-        this.config = _.defaultsDeep(config, {
+        this.config = defaultsDeep(config, {
             whoisFallback: {
                 enabled: false,
                 cacheConfig: {
@@ -32,10 +35,8 @@ class IpCloudy {
         });
 
         // IP ranges
-        this.providers = _.reduce(
-            providerNames,
-            (acc, name) => _.set(acc, name, require(`${__dirname}/providers/${name}.js`)),
-            {}
+        this.providers = Object.fromEntries(
+            providerNames.map((key) => [key, require(`${__dirname}/providers/${key}.js`)])
         );
 
         this.providerCache = flatCache.load(
@@ -124,7 +125,7 @@ class IpCloudy {
         let maxAge = this.config.providerCache.maxAge;
         let age = this.providerCache.getKey(name + ':timestamp');
 
-        if (_.isNil(age) || (age + maxAge < now && maxAge > -1) || forceRefresh) {
+        if (isNil(age) || (age + maxAge < now && maxAge > -1) || forceRefresh) {
             return this._refreshProviderCache(name);
         }
         return Promise.resolve(0);
@@ -204,7 +205,7 @@ class IpCloudy {
 
         if (!result.cloud && this.config.whoisFallback.enabled) {
             let whoisValue = this.whoisCache.get(ip);
-            if (_.isNil(whoisValue)) {
+            if (isNil(whoisValue)) {
                 debug(`${ip} whois not in cache, getting it`);
                 whoisValue = await this.whoisFallback(ip, this.config.whoisFallback.whoisConfig);
                 this.whoisCache.set(ip, whoisValue);
