@@ -4,3 +4,4 @@
 .#*
 test/
 !.npmignore
+.nyc_output
