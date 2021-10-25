@@ -146,12 +146,12 @@ class IpCloudy {
     }
 
     async init(forceRefresh = false) {
-        await Promise.each(providerNames, async (name) => {
+        for (let name of providerNames) {
             await this._refreshProviderCacheIfExpired(name, forceRefresh);
             this._startRefreshInterval(name).catch(function (err) {
                 debug(err);
             });
-        });
+        }
     }
 
     stopRefresh() {
