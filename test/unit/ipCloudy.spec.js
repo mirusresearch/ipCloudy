@@ -2,7 +2,6 @@
 
 const test = require('ava');
 const tk = require('timekeeper');
-const Promise = require('bluebird');
 
 const IpCloudy = require('../../src/ipCloudy.js');
 const date = 1330688329321;
@@ -74,7 +73,7 @@ test('_refreshProviderCacheIfExpired() | udpates when past max age', async (t) =
     ipc.config.providerCache.maxAge = 4999;
     ipc.providerCache.setKey('test', ['10.0.0.0/24']);
     ipc.providerCache.setKey('test:timestamp', date - 5000);
-    ipc._refreshProviderCache = (n) => Promise.resolve(n);
+    ipc._refreshProviderCache = async (n) => n;
     let result = await ipc._refreshProviderCacheIfExpired('test');
     t.is(result, 'test');
 });
@@ -84,28 +83,17 @@ test('_refreshProviderCacheIfExpired() | do not update when under max age', asyn
     ipc.config.providerCache.maxAge = 5001;
     ipc.providerCache.setKey('test', ['10.0.0.0/24']);
     ipc.providerCache.setKey('test:timestamp', date - 5000);
-    ipc._refreshProviderCache = (n) => Promise.resolve(n);
+    ipc._refreshProviderCache = async (n) => n;
     let result = await ipc._refreshProviderCacheIfExpired('test');
     t.is(result, 0);
 });
 
-// cant test that the function never halts...thats the halting problem
-// I can make sure it does multiple loops without resolving though
-// test('_startRefreshinterval() | resolves when closed', async (t) => {
-//     let ipc = new IpCloudy({ providerCache: { refreshRate: 100, writeToFile: false } });
-//     let bluePromise = Promise.resolve(ipc._startRefreshInterval('gce'));
-//     return bluePromise
-//         .timeout(500)
-//         .then(() => t.fail('should not resolve'))
-//         .catch(Promise.TimeoutError, (e) => t.pass('should timeout because it never resolves'));
-// });
-
-test('_startRefreshinterval() | resolves when closed', async (t) => {
+test('_startRefreshinterval() | resolves when closed, stops timer', async (t) => {
     let ipc = new IpCloudy({ providerCache: { refreshRate: 100, writeToFile: false } });
-    let promise = ipc._startRefreshInterval('gce');
+    ipc._startRefreshInterval('gce');
 
-    ipc.stopRefresh();
-    t.is(await promise, 0);
+    await ipc.stopRefresh();
+    t.is(ipc.refreshTimers[0].stopped, true);
 });
 
 test('check() | returns appropriate response for azure ip', async (t) => {

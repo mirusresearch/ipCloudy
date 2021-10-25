@@ -49,5 +49,10 @@
         "nyc": "^15.1.0",
         "prettier": "^2.3.2",
         "timekeeper": "^2.0.0"
+    },
+    "ava": {
+        "files": [
+            "test/unit/**/*.spec.js"
+        ]
     }
 }

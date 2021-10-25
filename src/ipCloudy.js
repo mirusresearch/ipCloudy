@@ -57,7 +57,7 @@ class IpCloudy {
         }
 
         // keep track of timers so we can close them
-        this.resfreshTimers = [];
+        this.refreshTimers = [];
     }
 
     async _convertRangestring(name, data) {
@@ -129,7 +129,7 @@ class IpCloudy {
             return this._refreshProviderCache(name);
         }
 
-        return undefined;
+        return 0;
     }
 
     _startRefreshInterval(name) {
@@ -137,7 +137,7 @@ class IpCloudy {
         const timer = setIntervalAsync(async () => {
             await this._refreshProviderCacheIfExpired(name);
         }, refreshRate);
-        this.resfreshTimers.push(timer);
+        this.refreshTimers.push(timer);
     }
 
     async init(forceRefresh = false) {
@@ -153,7 +153,7 @@ class IpCloudy {
 
     async stopRefresh() {
         debug('ending refresh loops..');
-        for (let timer of this.timers) {
+        for (let timer of this.refreshTimers) {
             await clearIntervalAsync(timer);
         }
     }

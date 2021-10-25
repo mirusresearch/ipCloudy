@@ -2,12 +2,11 @@
 const dns = require('dns');
 const util = require('util');
 
-util.promisifyAll(dns);
-
+const resolveTxtAsync = util.promisify(dns.resolveTxt);
 const blockUrl = '_cloud-netblocks.googleusercontent.com';
 
 async function lookupDns(url) {
-    const result = await dns.resolveTxtAsync(url);
+    const result = await resolveTxtAsync(url);
     const inner = result[0];
     return Array.isArray(inner) ? inner[0] : inner;
 }
