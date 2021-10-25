@@ -1,24 +1,30 @@
 /* global module, require */
 const dns = require('dns');
-const Promise = require('bluebird');
+const util = require('util');
 
-Promise.promisifyAll(dns);
+util.promisifyAll(dns);
 
 const blockUrl = '_cloud-netblocks.googleusercontent.com';
 
 async function lookupDns(url) {
-    let result = await dns.resolveTxtAsync(url);
-    let inner = result[0];
+    const result = await dns.resolveTxtAsync(url);
+    const inner = result[0];
     return Array.isArray(inner) ? inner[0] : inner;
 }
 
 module.exports = async function () {
-    let textRecord = await lookupDns(blockUrl);
-    let blocks = textRecord
+    const textRecord = await lookupDns(blockUrl);
+    const blocks = textRecord
         .split(' ')
         .filter((r) => r.includes('include:')) // take the strings with 'include:'
         .map((r) => r.replace('include:', '')); // remove 'include:'
-    let rawIPs = await Promise.map(blocks, async (b) => await lookupDns(b));
+
+    const rawIPs = [];
+    for (let block of blocks) {
+        const rawIP = await lookupDns(block);
+        rawIPs.push(rawIP);
+    }
+
     const extractedIPs = [
         ...rawIPs
             .filter(Boolean) // remove falsey array elements
