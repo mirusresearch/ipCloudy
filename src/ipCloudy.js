@@ -128,7 +128,8 @@ class IpCloudy {
         if (isNil(age) || (age + maxAge < now && maxAge > -1) || forceRefresh) {
             return this._refreshProviderCache(name);
         }
-        return Promise.resolve(0);
+
+        return undefined;
     }
 
     async _startRefreshInterval(name) {
@@ -140,7 +141,8 @@ class IpCloudy {
             await this._refreshProviderCacheIfExpired(name);
             return this._startRefreshInterval(name);
         }
-        return Promise.resolve(0);
+
+        return undefined;
     }
 
     async init(forceRefresh = false) {
