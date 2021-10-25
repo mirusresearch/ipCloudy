@@ -2,7 +2,7 @@
 'use strict';
 
 const { defaultsDeep } = require('lodash');
-const { setIntervalAsync, clearIntervalAsync } = require('set-interval-async/dynamic');
+const { setIntervalAsync, clearIntervalAsync } = require('set-interval-async/fixed');
 const lruCache = require('lru-cache');
 const publicIp = require('public-ip');
 const debug = require('debug')('index');
