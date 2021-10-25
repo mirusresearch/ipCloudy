@@ -1,10 +1,10 @@
 /* global module, require */
 
 const whois = require('whois');
-const Promise = require('bluebird');
+const util = require('util');
 const debug = require('debug')('whois');
 
-const lookup = Promise.promisify(whois.lookup);
+const lookup = util.promisify(whois.lookup);
 const entryRegex = /^(network:)?Organization(;I)?:\W*(.*)/;
 
 module.exports = async function (ip, whoisConfig) {

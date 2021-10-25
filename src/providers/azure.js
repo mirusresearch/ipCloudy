@@ -2,12 +2,12 @@
 
 const xml = require('xml2js');
 const axios = require('axios');
-const Promise = require('bluebird');
+const util = require('util');
 
 const axiosCookieJarSupport = require('axios-cookiejar-support').default;
 
 axiosCookieJarSupport(axios);
-const parse = Promise.promisify(xml.parseString);
+const parse = util.promisify(xml.parseString);
 
 const uri = 'https://www.microsoft.com/en-us/download/confirmation.aspx?id=41653';
 const fileRegex = /href="(.*?PublicIPs.*?xml)"/;

@@ -2,7 +2,7 @@
 'use strict';
 
 const { defaultsDeep } = require('lodash');
-const Promise = require('bluebird');
+const { setIntervalAsync, clearIntervalAsync } = require('set-interval-async/fixed');
 const lruCache = require('lru-cache');
 const publicIp = require('public-ip');
 const debug = require('debug')('index');
@@ -56,8 +56,8 @@ class IpCloudy {
             this.whoisCache = new lruCache(this.config.whoisFallback.cacheConfig);
         }
 
-        // if true the infinite refresh loops will halt
-        this._closed = false;
+        // keep track of timers so we can close them
+        this.refreshTimers = [];
     }
 
     async _convertRangestring(name, data) {
@@ -121,40 +121,41 @@ class IpCloudy {
     }
 
     async _refreshProviderCacheIfExpired(name, forceRefresh = false) {
-        let now = Date.now();
-        let maxAge = this.config.providerCache.maxAge;
-        let age = this.providerCache.getKey(name + ':timestamp');
+        const now = Date.now();
+        const maxAge = this.config.providerCache.maxAge;
+        const age = this.providerCache.getKey(name + ':timestamp');
 
         if (isNil(age) || (age + maxAge < now && maxAge > -1) || forceRefresh) {
             return this._refreshProviderCache(name);
         }
-        return Promise.resolve(0);
+
+        return 0;
     }
 
-    async _startRefreshInterval(name) {
-        let maxAge = this.config.providerCache.maxAge;
-        let refreshRate = this.config.providerCache.refreshRate;
-
-        if (maxAge > -1 && !this._closed) {
-            await Promise.delay(refreshRate);
+    _startRefreshInterval(name) {
+        const refreshRate = this.config.providerCache.refreshRate;
+        const timer = setIntervalAsync(async () => {
             await this._refreshProviderCacheIfExpired(name);
-            return this._startRefreshInterval(name);
-        }
-        return Promise.resolve(0);
+        }, refreshRate);
+        this.refreshTimers.push(timer);
     }
 
     async init(forceRefresh = false) {
-        await Promise.each(providerNames, async (name) => {
+        const maxAge = this.config.providerCache.maxAge;
+
+        for (let name of providerNames) {
             await this._refreshProviderCacheIfExpired(name, forceRefresh);
-            this._startRefreshInterval(name).catch(function (err) {
-                debug(err);
-            });
-        });
+            if (maxAge > -1) {
+                this._startRefreshInterval(name);
+            }
+        }
     }
 
-    stopRefresh() {
+    async stopRefresh() {
         debug('ending refresh loops..');
-        this._closed = true;
+        for (let timer of this.refreshTimers) {
+            await clearIntervalAsync(timer);
+        }
     }
 
     async check(ip = null) {
