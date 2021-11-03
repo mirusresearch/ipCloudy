@@ -8,5 +8,5 @@ module.exports = async function () {
         url: 'https://ip-ranges.amazonaws.com/ip-ranges.json',
         json: true,
     });
-    return response.data.prefixes.map((obj) => obj.ip_prefix);
+    return response.data.prefixes.map((obj) => obj.ip_prefix).concat(response.data.ipv6_prefixes.map((obj) => obj.ipv6_prefix));
 };
