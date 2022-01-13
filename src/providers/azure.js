@@ -4,16 +4,19 @@ const xml = require('xml2js');
 const axios = require('axios');
 const util = require('util');
 
-const axiosCookieJarSupport = require('axios-cookiejar-support').default;
+const { wrapper } = require('axios-cookiejar-support');
+const { CookieJar } = require('tough-cookie');
+const jar = new CookieJar();
 
-axiosCookieJarSupport(axios);
+const client = wrapper(axios.create({ jar }));
+
 const parse = util.promisify(xml.parseString);
 
 const uri = 'https://www.microsoft.com/en-us/download/confirmation.aspx?id=41653';
 const fileRegex = /href="(.*?PublicIPs.*?xml)"/;
 
 module.exports = async function () {
-    let response = await axios.get(uri, { jar: true, withCredentials: true });
+    let response = await client.get(uri);
     let page = response.data;
 
     let uriMatches = fileRegex.exec(page);
@@ -22,7 +25,7 @@ module.exports = async function () {
     }
     let rangeXMLUri = uriMatches[1];
 
-    let xmlResponse = await axios.get(rangeXMLUri, { jar: true, withCredentials: true });
+    let xmlResponse = await client.get(rangeXMLUri);
     let jsonData = await parse(xmlResponse.data);
     let regions = jsonData.AzurePublicIpAddresses.Region.map((range) =>
         (range.IpRange || []).map((ipr) => ipr.$.Subnet)
