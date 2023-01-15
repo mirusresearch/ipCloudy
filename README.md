@@ -9,11 +9,12 @@ Ranges will be auto refreshed after a configured interval (1 week by default).
 If the whois fallback is enabled, the first 100 (this is configurable) ips will be cached using a lru cache.
 
 ## Version Requirements:
-
 - versions **before 0.2.0** will work with node 8.x
-- version **0.2.0 and above** require >= node v10.18
-- version **0.3.0 and above** require >= node v12.18
-- version **0.5.0 and above** require >= node v12.22
+- version **0.2.0 and above** requires >= node v10.18
+- version **0.3.0 and above** requires >= node v12.18
+- version **0.5.0 and above** requires >= node v12.22
+- version **0.6.0 and above** requires >= node v12.22
+
 
 # Installation
 
