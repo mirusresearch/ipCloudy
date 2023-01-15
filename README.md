@@ -85,3 +85,6 @@ $ yarn test
 
 - [Prettier.js](https://prettier.io/) for formatting -- configuration can be found in `.prettierrc`
 - [eslint](https://eslint.org/) for linting -- the configuration can be found in `.eslint.rc.json`
+
+## Credits
+The original concept for this module was laid out in [which-cloud](https://github.com/bcoe/which-cloud).
